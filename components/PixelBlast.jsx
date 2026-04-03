@@ -523,24 +523,46 @@ const PixelBlast = ({
       });
       let raf = 0;
       const animate = () => {
+        const t = threeRef.current;
+        if (!t || !t.renderer || !t.scene || !t.camera || !t.uniforms) {
+          cancelAnimationFrame(raf);
+          return;
+        }
+
         if (autoPauseOffscreen && !visibilityRef.current.visible) {
           raf = requestAnimationFrame(animate);
           return;
         }
-        uniforms.uTime.value = timeOffset + clock.getElapsedTime() * speedRef.current;
-        if (liquidEffect) liquidEffect.uniforms.get('uTime').value = uniforms.uTime.value;
-        if (composer) {
-          if (touch) touch.update();
-          composer.passes.forEach(p => {
-            const effs = p.effects;
-            if (effs)
-              effs.forEach(eff => {
-                const u = eff.uniforms?.get('uTime');
-                if (u) u.value = uniforms.uTime.value;
-              });
-          });
-          composer.render();
-        } else renderer.render(scene, camera);
+
+        try {
+          t.uniforms.uTime.value = timeOffset + clock.getElapsedTime() * speedRef.current;
+          
+          if (t.liquidEffect) {
+            const uTime = t.liquidEffect.uniforms.get('uTime');
+            if (uTime) uTime.value = t.uniforms.uTime.value;
+          }
+
+          if (t.composer) {
+            if (t.touch) t.touch.update();
+            t.composer.passes.forEach(p => {
+              const effs = p.effects;
+              if (effs) {
+                effs.forEach((eff) => {
+                  const u = eff.uniforms?.get('uTime');
+                  if (u) u.value = t.uniforms.uTime.value;
+                });
+              }
+            });
+            t.composer.render();
+          } else {
+            t.renderer.render(t.scene, t.camera);
+          }
+        } catch (error) {
+          console.warn('PixelBlast render cycle interrupted:', error);
+          cancelAnimationFrame(raf);
+          return;
+        }
+        
         raf = requestAnimationFrame(animate);
       };
       raf = requestAnimationFrame(animate);

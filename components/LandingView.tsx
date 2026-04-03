@@ -55,7 +55,7 @@ export default function LandingView() {
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => setStatus("connected")}
+          onClick={() => setStatus("searching")}
           className="group relative flex h-14 w-full items-center justify-center gap-2 overflow-hidden rounded-full bg-white px-8 text-lg font-semibold text-black transition-all hover:bg-zinc-200"
         >
           <Zap className="h-5 w-5 fill-current" />

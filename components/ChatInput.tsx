@@ -5,15 +5,19 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Send, Hash } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { cn } from '@/lib/utils'
+import { useLiveKit } from '@/hooks/useLiveKit'
 
 export default function ChatInput() {
   const [text, setText] = useState('')
   const addMessage = useChatStore((state) => state.addMessage)
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const { sendMessage, sendTypingStatus } = useLiveKit()
 
   const handleSend = () => {
     if (!text.trim()) return
     addMessage(text.trim(), 'me')
+    sendMessage(text.trim())
+    sendTypingStatus(null)
     setText('')
     
     // Auto-focus back to input
@@ -25,6 +29,13 @@ export default function ChatInput() {
       e.preventDefault()
       handleSend()
     }
+  }
+
+  // Handle typing status sync
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const val = e.target.value
+    setText(val)
+    sendTypingStatus(val.length > 0 ? val : null)
   }
 
   // Auto-resize textarea
@@ -52,7 +63,7 @@ export default function ChatInput() {
           rows={1}
           placeholder="Type a message..."
           value={text}
-          onChange={(e) => setText(e.target.value)}
+          onChange={handleChange}
           onKeyDown={handleKeyDown}
           className="max-h-32 flex-1 resize-none bg-transparent py-1.5 text-sm text-zinc-100 outline-none placeholder:text-zinc-600 font-medium"
         />
