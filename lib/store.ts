@@ -14,12 +14,17 @@ interface ChatState {
   ghostMessage: string | null
   roomId: string | null
   userId: string
+  connectionUrl: string | null
+  token: string | null
+  error: string | null
   
   // Actions
   setStatus: (status: ChatState['status']) => void
   addMessage: (text: string, sender: 'me' | 'other') => void
   setGhostMessage: (text: string | null) => void
   setRoomId: (roomId: string | null) => void
+  setConnectionData: (url: string, token: string) => void
+  setError: (error: string | null) => void
   reset: () => void
 }
 
@@ -28,6 +33,9 @@ export const useChatStore = create<ChatState>((set) => ({
   messages: [],
   ghostMessage: null,
   roomId: null,
+  connectionUrl: null,
+  token: null,
+  error: null,
   // Generate a persistent userId for the session
   userId: typeof window !== 'undefined' ? 
     (localStorage.getItem('chat_user_id') || uuidv4()) : uuidv4(),
@@ -46,12 +54,19 @@ export const useChatStore = create<ChatState>((set) => ({
   setGhostMessage: (ghostMessage) => set({ ghostMessage }),
   
   setRoomId: (roomId) => set({ roomId }),
+
+  setConnectionData: (connectionUrl, token) => set({ connectionUrl, token }),
+
+  setError: (error) => set({ error }),
   
   reset: () => set({
     status: 'idle',
     messages: [],
     ghostMessage: null,
-    roomId: null
+    roomId: null,
+    connectionUrl: null,
+    token: null,
+    error: null
   })
 }))
 
