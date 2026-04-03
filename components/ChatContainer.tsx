@@ -2,9 +2,9 @@
 
 import { useChatStore } from '@/lib/store'
 import { AnimatePresence, motion } from 'framer-motion'
-import LandingView from './LandingView'
-import SearchingView from './SearchingView'
-import ChatView from './ChatView'
+import LandingView from '@/components/LandingView'
+import SearchingView from '@/components/SearchingView'
+import ChatView from '@/components/ChatView'
 
 export default function ChatContainer() {
   const status = useChatStore((state) => state.status)
